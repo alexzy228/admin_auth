@@ -42,7 +42,7 @@ class ConfigProvider
                     'id' => 'database',
                     'description' => 'admin_auth 数据库迁移工具.', // 描述
                     // 建议默认配置放在 publish 文件夹中，文件命名和组件名称相同
-                    'source' => __DIR__ . '/../publish/database/admin_auth.php.stub',  // 对应的配置文件路径
+                    'source' => __DIR__ . '/../publish/database/create_auth_tables.php.stub',  // 对应的配置文件路径
                     'destination' => $this->getMigrationFileName(), // 复制为这个路径下的该文件
                 ],
             ],
@@ -56,7 +56,7 @@ class ConfigProvider
         return Collection::make(BASE_PATH . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR)
             ->flatMap(function ($path) use ($filesystem) {
                 return $filesystem->glob($path . '*_create_auth_tables.php');
-            })->push(BASE_PATH . "/migrations/{$timestamp}_create_permission_tables.php")
+            })->push(BASE_PATH . "/migrations/{$timestamp}_create_auth_tables.php")
             ->first();
     }
 }
