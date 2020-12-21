@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Ycbl\AdminAuth;
-
 
 use Hyperf\Di\Annotation\Inject;
 use Qbhy\HyperfAuth\Authenticatable;
@@ -59,5 +57,17 @@ class Auth
     public function isSuperAdmin()
     {
         return $this->auth->isSuperAdmin();
+    }
+
+    /**
+     * 检查权限
+     * @param $name
+     * @param string $uid
+     * @param string $relation
+     * @return bool
+     */
+    public function check($name, $uid = '', $relation = 'or')
+    {
+        return $this->auth->check($name, $uid, $relation);
     }
 }
