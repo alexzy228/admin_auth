@@ -41,10 +41,15 @@ class RuleService
         $list = $this->authRuleDao->getRuleList()->toArray();
         $tree = make(TreeService::class)->init($list);
         $arrTree = $tree->getTreeArray(0);
-        if ($type == self::TREE){
+        if ($type == self::TREE) {
             return $arrTree;
-        }else{
+        } else {
             return $tree->getTreeList($arrTree, 'title');
         }
+    }
+
+    public function createRule()
+    {
+
     }
 }
