@@ -168,7 +168,7 @@ class RuleService
         $del_ids = [];
         foreach ($ids as $k => $v) {
             $all_rule = $this->authRuleDao->getRuleList()->toArray();
-            $children_ids = make(TreeService::class)->init($all_rule)->getChildrenIds($v);
+            $children_ids = make(TreeService::class)->init($all_rule)->getChildrenIds($v,true);
             $del_ids = array_merge($del_ids, $children_ids);
         }
         return $this->authRuleDao->deleteRule($del_ids);
