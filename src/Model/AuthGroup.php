@@ -19,6 +19,8 @@ class AuthGroup extends Model
      * @var string
      */
     protected $table = 'auth_group';
+
+    protected $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -16,6 +16,8 @@ class AuthGroupAccess extends Model
      * @var string
      */
     protected $table = 'auth_group_access';
+
+    protected $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
