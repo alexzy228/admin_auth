@@ -90,8 +90,6 @@ class RuleService
             'path' => 'required|unique:auth_rule',
             'auth' => 'required|unique:auth_rule',
             'title' => 'required',
-            'icon' => 'required',
-            'remark' => 'required',
             'ismenu' => 'required|boolean',
             'weigh' => 'required|integer',
         ]);
@@ -148,8 +146,6 @@ class RuleService
             'path' => 'required|unique:auth_rule,path,' . $id . ',id',
             'auth' => 'required|unique:auth_rule,auth,' . $id . ',id',
             'title' => 'required',
-            'icon' => 'required',
-            'remark' => 'required',
             'ismenu' => 'required|boolean',
             'weigh' => 'required|integer',
         ]);
