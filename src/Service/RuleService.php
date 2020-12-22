@@ -99,4 +99,76 @@ class RuleService
         }
         return $this->authRuleDao->insertRule($data);
     }
+
+    /**
+     * 编辑规则
+     * @param $id
+     * @param string $title
+     * @param string $path
+     * @param string $auth
+     * @param $icon
+     * @param $pid
+     * @param $is_menu
+     * @param $weigh
+     * @param $remark
+     * @return int
+     * @throws Exception
+     */
+    public function editRule($id, string $title, string $path, string $auth, $icon, $pid, $is_menu, $weigh, $remark)
+    {
+        $rule = $this->authRuleDao->getOneRuleById($id);
+        if (!$rule) {
+            throw new Exception('记录未找到');
+        }
+        if (!$is_menu && !$pid) {
+            throw new Exception('非菜单规则节点必须有父级');
+        }
+        if ($pid != $rule->pid) {
+            //获取当前节点的所有子节点ID
+            $all_rule = $this->authRuleDao->getRuleList()->toArray();
+            $children_ids = make(TreeService::class)->init($all_rule)->getChildrenIds($rule->id);
+            if (in_array($pid, $children_ids)) {
+                throw new Exception("变更的父组别不能是它的子组别");
+            }
+        }
+        $data = [
+            'pid' => $pid,
+            'path' => $path,
+            'auth' => $auth,
+            'title' => $title,
+            'icon' => $icon,
+            'remark' => $remark,
+            'ismenu' => $is_menu,
+            'weigh' => $weigh,
+        ];
+
+        $validator = $this->validationFactory->make($data, [
+            'pid' => 'required|integer',
+            'path' => 'required|unique:auth_rule,path,' . $id . ',id',
+            'auth' => 'required|unique:auth_rule,auth,' . $id . ',id',
+            'title' => 'required',
+            'icon' => 'required',
+            'remark' => 'required',
+            'ismenu' => 'required|boolean',
+            'weigh' => 'required|integer',
+        ]);
+        if ($validator->fails()) {
+            throw new Exception($validator->errors()->first());
+        }
+        return $this->authRuleDao->updateRuleById($id, $data);
+    }
+
+    public function deleteRule($ids)
+    {
+        if (!is_array($ids)) {
+            $ids = explode(',', $ids);
+        }
+        $del_ids = [];
+        foreach ($ids as $k => $v) {
+            $all_rule = $this->authRuleDao->getRuleList()->toArray();
+            $children_ids = make(TreeService::class)->init($all_rule)->getChildrenIds($v);
+            $del_ids = array_merge($del_ids, $children_ids);
+        }
+        return $this->authRuleDao->deleteRule($del_ids);
+    }
 }

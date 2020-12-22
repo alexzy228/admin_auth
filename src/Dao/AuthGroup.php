@@ -24,6 +24,10 @@ class AuthGroup
         return $this->model::query()->whereIn('id', $ids)->get();
     }
 
+    public function getGroupsByPid($ids)
+    {
+        return $this->model::query()->whereIn('pid', $ids)->get();
+    }
 
     public function getEnableGroupsById($ids)
     {
@@ -48,5 +52,15 @@ class AuthGroup
     public function insertGroup($data)
     {
         return $this->model::query()->insert($data);
+    }
+
+    public function updateGroupById($id, $data)
+    {
+        return $this->model::query()->where('id', $id)->update($data);
+    }
+
+    public function deleteGroup($ids)
+    {
+        return $this->model::query()->whereIn('id',$ids)->delete();
     }
 }

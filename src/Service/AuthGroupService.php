@@ -3,6 +3,7 @@
 namespace Ycbl\AdminAuth\Service;
 
 use Exception;
+use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
 use Ycbl\AdminAuth\Dao\AuthGroup;
 use Ycbl\AdminAuth\Dao\AuthGroupAccess;
@@ -114,6 +115,97 @@ class AuthGroupService
             'rules' => $rules,
         ];
         return $this->authGroupDao->insertGroup($data);
+    }
+
+    /**
+     * 编辑权限组
+     * @param $group_id
+     * @param $pid
+     * @param $rules
+     * @param $name
+     * @param $status
+     * @return bool
+     * @throws Exception
+     */
+    public function editAuthGroup($group_id, $pid, $rules, $name, $status)
+    {
+        $current_group = $this->authGroupDao->getOneGroupsById($group_id);
+        if (!$current_group) {
+            throw new Exception('记录未找到');
+        }
+        $children_group_ids = $this->getChildrenGroupIds(true);
+        if (!in_array($group_id, $children_group_ids)) {
+            throw new Exception('您没有权限');
+        }
+        if (!in_array($pid, $children_group_ids)) {
+            throw new Exception('父组别超出权限范围');
+        }
+        $children_group_list = $this->authGroupDao->getGroupsById($children_group_ids);
+        $tree = make(TreeService::class)->init($children_group_list->toArray());
+        if (in_array($pid, $tree->getChildrenIds($group_id))) {
+            throw new Exception('父组别不能是它的子组别及本身');
+        }
+
+        $rules = explode(',', $rules);
+
+        $parent_group = $this->authGroupDao->getOneGroupsById($pid);
+        if (!$parent_group) {
+            throw new Exception('父组别未找到');
+        }
+        // 父级别的规则节点
+        $parent_rules = explode(',', $parent_group->rules);
+
+        // 当前组别的规则节点
+        $current_rules = $this->auth->getRuleIds();
+
+        // 如果父组不是超级管理员则需要过滤规则节点,不能超过父组别的权限
+        $rules = in_array('*', $parent_rules) ? $rules : array_intersect($parent_rules, $rules);
+        // 如果当前组别不是超级管理员则需要过滤规则节点,不能超当前组别的权限
+        $rules = in_array('*', $current_rules) ? $rules : array_intersect($current_rules, $rules);
+
+        $rules = implode(',', $rules);
+        Db::transaction(function () use ($children_group_list, $group_id, $status, $rules, $name, $pid) {
+            $updateData = [
+                'pid' => $pid,
+                'name' => $name,
+                'rules' => $rules,
+                'status' => $status,
+            ];
+            $this->authGroupDao->updateGroupById($group_id, $updateData);
+            foreach ($children_group_list as $key => $value) {
+                $value->rules = implode(',', array_intersect(explode(',', $value->rules), explode(',', $rules)));
+                $value->save();
+            }
+        });
+        return true;
+    }
+
+    public function deleteAuthGroup($ids)
+    {
+        $ids = explode(',', $ids);
+        $group_list = $this->auth->getGroups();
+        $group_ids = array_map(function ($group) {
+            return $group['id'];
+        }, $group_list->toArray());
+        // 移除掉当前管理员所在组别
+        $ids = array_diff($ids, $group_ids);
+        $group_list = $this->authGroupDao->getGroupsById($ids);
+        foreach ($group_list as $key => $value) {
+            $group_user = $this->authGroupAccessDao->getUsersByGroupId($value->id);
+            if ($group_user){
+                $ids = array_diff($ids, [$value->id]);
+                continue;
+            }
+            $group_child = $this->authGroupDao->getGroupsByPid($value->id);
+            if ($group_child) {
+                $ids = array_diff($ids, [$value->id]);
+                continue;
+            }
+        }
+        if (!$ids){
+            throw new Exception('你不能删除含有子组和管理员的组');
+        }
+        return $this->authGroupDao->deleteGroup($ids);
     }
 
     /**
@@ -232,14 +324,14 @@ class AuthGroupService
 
     public function getChildrenAdminIds($with_self = false)
     {
-        if (!$this->auth->isSuperAdmin()){
+        if (!$this->auth->isSuperAdmin()) {
             $group_ids = $this->getChildrenGroupIds();
             $children_admin_ids = $this->authGroupAccessDao->getUsersByGroupId($group_ids)->pluck('uid');
         } else {
             $children_admin_ids = $this->userDao->getAllUserIds()->toArray();
         }
 
-        if ($with_self){
+        if ($with_self) {
             //包含自身 则添加自身ID
             if (!in_array($this->auth->getUserId(), $children_admin_ids)) {
                 $children_admin_ids[] = $this->auth->getUserId();

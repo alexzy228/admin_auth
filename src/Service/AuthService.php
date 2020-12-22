@@ -78,7 +78,7 @@ class AuthService
     }
 
     /**
-     * 获取用户权限组
+     * 获取用户所在权限组
      * @param $uid
      * @return array|Collection|mixed
      */

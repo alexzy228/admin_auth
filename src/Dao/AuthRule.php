@@ -27,9 +27,24 @@ class AuthRule
             ->get();
     }
 
+    public function getOneRuleById($id)
+    {
+        return $this->model::query()->where('id', $id)->first();
+    }
+
     public function insertRule($data)
     {
         return $this->model::query()->insert($data);
+    }
+
+    public function updateRuleById($id, $data)
+    {
+        return $this->model::query()->where('id', $id)->update($data);
+    }
+
+    public function deleteRule($ids)
+    {
+        return $this->model::query()->whereIn('id',$ids)->delete();
     }
 
     public function getAllMenu()
