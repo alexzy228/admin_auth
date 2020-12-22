@@ -1,13 +1,13 @@
 <?php
 
-
 namespace Ycbl\AdminAuth\Service;
 
-
-use _HumbugBox39a196d4601e\Nette\Neon\Exception;
+use Exception;
 use Hyperf\Di\Annotation\Inject;
 use Ycbl\AdminAuth\Dao\AuthGroup;
+use Ycbl\AdminAuth\Dao\AuthGroupAccess;
 use Ycbl\AdminAuth\Dao\AuthRule;
+use Ycbl\AdminAuth\Dao\User;
 
 class AuthGroupService
 {
@@ -25,10 +25,26 @@ class AuthGroupService
 
     /**
      * @Inject
+     * @var AuthGroupAccess
+     */
+    protected $authGroupAccessDao;
+
+    /**
+     * @Inject
+     * @var User
+     */
+    protected $userDao;
+
+    /**
+     * @Inject
      * @var AuthService
      */
     protected $auth;
 
+    /**
+     * 获取当前用户权限组列表
+     * @return array
+     */
     public function getList()
     {
         $children_group_ids = $this->getChildrenGroupIds(true);
@@ -65,6 +81,14 @@ class AuthGroupService
         return $list;
     }
 
+    /**
+     * 创建权限组
+     * @param $pid
+     * @param $name
+     * @param $rules
+     * @return bool
+     * @throws Exception
+     */
     public function createGroup($pid, $name, $rules)
     {
         $children_group_ids = $this->getChildrenGroupIds(true);
@@ -92,6 +116,13 @@ class AuthGroupService
         return $this->authGroupDao->insertGroup($data);
     }
 
+    /**
+     * 获取权限组节点树
+     * @param $pid
+     * @param null $id
+     * @return array
+     * @throws Exception
+     */
     public function getRoueTree($pid, $id = null)
     {
         $parent_group = $this->authGroupDao->getOneGroupsById($pid);
@@ -156,7 +187,7 @@ class AuthGroupService
     }
 
     /**
-     * 取出当前管理员所拥有权限的分组
+     * 取出当前管理员所拥有权限的分组ID
      * @param false $withSelf
      * @return array
      */
@@ -164,7 +195,7 @@ class AuthGroupService
     {
         $groups = $this->auth->getGroups();
         $groups_ids = [];
-        foreach ($groups as $k => $v){
+        foreach ($groups as $k => $v) {
             $groups_ids[] = $v['id'];
         }
         $origin_group_ids = $groups_ids;
@@ -177,13 +208,13 @@ class AuthGroupService
         // 取出所有分组
         $group_list = $this->authGroupDao->getEnableGroups()->toArray();
         $obj_list = [];
-        foreach ($groups as $k => $v){
-            if ($v['rules'] === '*'){
+        foreach ($groups as $k => $v) {
+            if ($v['rules'] === '*') {
                 $obj_list = $group_list;
                 break;
             }
             $tree = make(TreeService::class)->init($group_list);
-            $children_list = $tree->getChildren($v['id'],true);
+            $children_list = $tree->getChildren($v['id'], true);
 
             $children_tree = make(TreeService::class)->init($children_list);
             $obj = $children_tree->getTreeList($children_tree->getTreeArray($v['pid']));
@@ -197,5 +228,26 @@ class AuthGroupService
             $children_group_ids = array_diff($children_group_ids, $groups_ids);
         }
         return $children_group_ids;
+    }
+
+    public function getChildrenAdminIds($with_self = false)
+    {
+        if (!$this->auth->isSuperAdmin()){
+            $group_ids = $this->getChildrenGroupIds();
+            $children_admin_ids = $this->authGroupAccessDao->getUsersByGroupId($group_ids)->pluck('uid');
+        } else {
+            $children_admin_ids = $this->userDao->getAllUserIds()->toArray();
+        }
+
+        if ($with_self){
+            //包含自身 则添加自身ID
+            if (!in_array($this->auth->getUserId(), $children_admin_ids)) {
+                $children_admin_ids[] = $this->auth->getUserId();
+            }
+        } else {
+            //不包含自身则排除自身ID
+            $children_admin_ids = array_diff($children_admin_ids, [$this->auth->getUserId()]);
+        }
+        return $children_admin_ids;
     }
 }

@@ -26,6 +26,7 @@
         "hyperf/di": "^2.0",
         "hyperf/http-server":  "~2.0.0",
         "hyperf/db-connection": "~2.0.0",
+        "hyperf/validation": "~2.0.0",
         "96qbhy/hyperf-auth": "^2.3",
         "hyperf/redis": "~2.0.0",
         "ext-pdo": "*",

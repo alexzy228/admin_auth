@@ -50,6 +50,11 @@ class AuthService
         $this->config = $config->get('admin_auth');
     }
 
+    /**
+     * 获取菜单列表
+     * @param int $type
+     * @return array
+     */
     public function getMenuList(int $type = self::TREE)
     {
         // 读取管理员当前拥有的权限节点
@@ -201,9 +206,22 @@ class AuthService
         return false;
     }
 
+    /**
+     * 判断当前用户是否超级管理员
+     * @return bool
+     */
     public function isSuperAdmin()
     {
         return in_array('*', $this->getRuleIds()) ? true : false;
+    }
+
+    /**
+     * 获取当前用户ID
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->authManager->user()->getId();
     }
 
 }
