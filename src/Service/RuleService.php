@@ -19,6 +19,7 @@ class RuleService
     protected $authRuleDao;
 
     /**
+     * @Inject
      * @var ValidatorFactoryInterface
      */
     protected $validationFactory;
