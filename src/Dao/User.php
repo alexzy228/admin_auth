@@ -15,7 +15,7 @@ class User
 
     public function __construct(ContainerInterface $container, ConfigInterface $config)
     {
-        $this->model = $container->get($config->get('admin_auth.user'));
+        $this->model = $container->get($config->get('admin_auth.auth_user'));
     }
 
     public function getAllUserIds()
