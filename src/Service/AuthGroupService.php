@@ -5,6 +5,7 @@ namespace Ycbl\AdminAuth\Service;
 use Exception;
 use Hyperf\DbConnection\Db;
 use Hyperf\Di\Annotation\Inject;
+use Hyperf\Utils\Collection;
 use Ycbl\AdminAuth\Dao\AuthGroup;
 use Ycbl\AdminAuth\Dao\AuthGroupAccess;
 use Ycbl\AdminAuth\Dao\AuthRule;
@@ -180,6 +181,12 @@ class AuthGroupService
         return true;
     }
 
+    /**
+     * 删除权限组
+     * @param $ids
+     * @return int|mixed
+     * @throws Exception
+     */
     public function deleteAuthGroup($ids)
     {
         $ids = explode(',', $ids);
@@ -322,6 +329,11 @@ class AuthGroupService
         return $children_group_ids;
     }
 
+    /**
+     * 获取当前用户的子用户ID
+     * @param false $with_self
+     * @return array|Collection
+     */
     public function getChildrenAdminIds($with_self = false)
     {
         if (!$this->auth->isSuperAdmin()) {

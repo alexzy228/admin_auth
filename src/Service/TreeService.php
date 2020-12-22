@@ -169,6 +169,11 @@ class TreeService
         return $parentsIds;
     }
 
+    /**
+     * 获取树状列表
+     * @param $my_id
+     * @return array
+     */
     public function getTreeArray($my_id)
     {
         $childes = $this->getChild($my_id);
@@ -184,6 +189,12 @@ class TreeService
         return $data;
     }
 
+    /**
+     * 转换树状列表为一维数组
+     * @param array $data
+     * @param string $field
+     * @return array
+     */
     public function getTreeList($data = [], $field = 'name')
     {
         $arr = [];

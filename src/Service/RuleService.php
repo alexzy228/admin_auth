@@ -158,6 +158,11 @@ class RuleService
         return $this->authRuleDao->updateRuleById($id, $data);
     }
 
+    /**
+     * 删除规则
+     * @param $ids
+     * @return int|mixed
+     */
     public function deleteRule($ids)
     {
         if (!is_array($ids)) {
