@@ -25,7 +25,7 @@ class AuthRule extends Model
      */
     protected $table = 'auth_rule';
 
-    protected $timestamps = false;
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

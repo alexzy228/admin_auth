@@ -20,7 +20,7 @@ class AuthGroup extends Model
      */
     protected $table = 'auth_group';
 
-    protected $timestamps = false;
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

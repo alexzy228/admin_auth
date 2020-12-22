@@ -17,7 +17,7 @@ class AuthGroupAccess extends Model
      */
     protected $table = 'auth_group_access';
 
-    protected $timestamps = false;
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
