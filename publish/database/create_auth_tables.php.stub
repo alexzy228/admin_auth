@@ -28,7 +28,7 @@ class CreateAuthTables extends Migration
             $table->increments('id');
             $table->unsignedInteger('pid')->default(0)->comment('父级ID');
             $table->string('name',50)->default('')->comment('权限组名');
-            $table->text('rules')->default('')->comment('规则ID');
+            $table->text('rules')->comment('规则ID');
             $table->TinyInteger('status')->default(1)->comment('状态');
         });
 
