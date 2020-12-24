@@ -189,7 +189,9 @@ class AuthGroupService
      */
     public function deleteAuthGroup($ids)
     {
-        $ids = explode(',', $ids);
+        if (!is_array($ids)){
+            $ids = explode(',', $ids);
+        }
         $group_list = $this->auth->getGroups();
         $group_ids = array_map(function ($group) {
             return $group['id'];
