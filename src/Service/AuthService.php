@@ -63,7 +63,7 @@ class AuthService
         // 获取所有菜单项
         if ($has_role){
             $ids = $this->getRuleIds();
-            $list = $this->authRuleDao->getEnableRulesById($ids);
+            $list = $this->authRuleDao->getEnableRulesById($ids)->toArray();
         }else{
             $list = $this->authRuleDao->getAllMenu()->toArray();
         }
