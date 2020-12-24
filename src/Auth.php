@@ -28,7 +28,7 @@ class Auth
     public function logout()
     {
         $this->auth->cleanCache();
-        return $this->authManager->logout();
+        return $this->getAuthManager()->logout();
     }
 
     /**
@@ -38,7 +38,7 @@ class Auth
      */
     public function login(Authenticatable $user)
     {
-        return $this->authManager->login($user);
+        return $this->getAuthManager()->login($user);
     }
 
     /**
@@ -47,7 +47,25 @@ class Auth
      */
     public function isLogin()
     {
-        return $this->authManager->check();
+        return $this->getAuthManager()->check();
+    }
+
+    /**
+     * 获取当前用户信息
+     * @return Authenticatable|null
+     */
+    public function user()
+    {
+        return $this->getAuthManager()->user();
+    }
+
+    /**
+     * 获取认证类
+     * @return AuthManager
+     */
+    public function getAuthManager()
+    {
+        return $this->authManager;
     }
 
     /**

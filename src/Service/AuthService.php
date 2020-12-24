@@ -53,26 +53,32 @@ class AuthService
     /**
      * 获取菜单列表
      * @param int $type
+     * @param bool $has_role
      * @return array
      */
-    public function getMenuList(int $type = self::TREE)
+    public function getMenuList(int $type = self::TREE, $has_role = false)
     {
         // 读取管理员当前拥有的权限节点
         $user_role = $this->getRuleList();
         // 获取所有菜单项
-        $menu_list = $this->authRuleDao->getAllMenu()->toArray();
+        if ($has_role){
+            $ids = $this->getRuleIds();
+            $list = $this->authRuleDao->getEnableRulesById($ids);
+        }else{
+            $list = $this->authRuleDao->getAllMenu()->toArray();
+        }
         //
-        foreach ($menu_list as $k => $v) {
+        foreach ($list as $k => $v) {
             if (!in_array($v['auth'], $user_role)) {
-                unset($menu_list[$k]);
+                unset($list[$k]);
             }
         }
-        $menu_tree = make(TreeService::class)->init($menu_list);
-        $menu = $menu_tree->getTreeArray(0);
+        $tree = make(TreeService::class)->init($list);
+        $result = $tree->getTreeArray(0);
         if ($type === self::LIST) {
-            return $menu_tree->getTreeList($menu);
+            return $tree->getTreeList($result);
         } else {
-            return $menu;
+            return $result;
         }
 
     }
