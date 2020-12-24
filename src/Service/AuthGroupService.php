@@ -193,7 +193,7 @@ class AuthGroupService
         $group_list = $this->auth->getGroups();
         $group_ids = array_map(function ($group) {
             return $group['id'];
-        }, $group_list->toArray());
+        }, $group_list);
         // 移除掉当前管理员所在组别
         $ids = array_diff($ids, $group_ids);
         $group_list = $this->authGroupDao->getGroupsById($ids);
