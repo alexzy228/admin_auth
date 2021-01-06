@@ -113,7 +113,7 @@ class AuthGroupService
         $data = [
             'pid' => $pid,
             'name' => $name,
-            'rules' => $rules,
+            'rules' => implode(',', $rules),
         ];
         return $this->authGroupDao->insertGroup($data);
     }
@@ -189,7 +189,7 @@ class AuthGroupService
      */
     public function deleteAuthGroup($ids)
     {
-        if (!is_array($ids)){
+        if (!is_array($ids)) {
             $ids = explode(',', $ids);
         }
         $group_list = $this->auth->getGroups();
@@ -201,7 +201,7 @@ class AuthGroupService
         $group_list = $this->authGroupDao->getGroupsById($ids);
         foreach ($group_list as $key => $value) {
             $group_user = $this->authGroupAccessDao->getUsersByGroupId($value->id);
-            if ($group_user){
+            if ($group_user) {
                 $ids = array_diff($ids, [$value->id]);
                 continue;
             }
@@ -211,7 +211,7 @@ class AuthGroupService
                 continue;
             }
         }
-        if (!$ids){
+        if (!$ids) {
             throw new Exception('你不能删除含有子组和管理员的组');
         }
         return $this->authGroupDao->deleteGroup($ids);
