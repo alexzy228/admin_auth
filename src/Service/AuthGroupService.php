@@ -165,7 +165,9 @@ class AuthGroupService
         $rules = in_array('*', $current_rules) ? $rules : array_intersect($current_rules, $rules);
 
         $rules = implode(',', $rules);
-        Db::transaction(function () use ($children_group_list, $group_id, $status, $rules, $name, $pid) {
+        $children_ids = $tree->getChildrenIds($group_id);
+        $children_group = $this->authGroupDao->getGroupsById($children_ids);
+        Db::transaction(function () use ($children_group, $group_id, $status, $rules, $name, $pid) {
             $updateData = [
                 'pid' => $pid,
                 'name' => $name,
@@ -173,7 +175,7 @@ class AuthGroupService
                 'status' => $status,
             ];
             $this->authGroupDao->updateGroupById($group_id, $updateData);
-            foreach ($children_group_list as $key => $value) {
+            foreach ($children_group as $key => $value) {
                 $value->rules = implode(',', array_intersect(explode(',', $value->rules), explode(',', $rules)));
                 $value->save();
             }
@@ -200,12 +202,12 @@ class AuthGroupService
         $ids = array_diff($ids, $group_ids);
         $group_list = $this->authGroupDao->getGroupsById($ids);
         foreach ($group_list as $key => $value) {
-            $group_user = $this->authGroupAccessDao->getUsersByGroupId($value->id);
+            $group_user = $this->authGroupAccessDao->getUsersByGroupId($value->id)->toArray();
             if ($group_user) {
                 $ids = array_diff($ids, [$value->id]);
                 continue;
             }
-            $group_child = $this->authGroupDao->getGroupsByPid($value->id);
+            $group_child = $this->authGroupDao->getGroupsByPid([$value->id])->toArray();
             if ($group_child) {
                 $ids = array_diff($ids, [$value->id]);
                 continue;
