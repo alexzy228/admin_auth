@@ -342,7 +342,7 @@ class AuthGroupService
     {
         if (!$this->auth->isSuperAdmin()) {
             $group_ids = $this->getChildrenGroupIds();
-            $children_admin_ids = $this->authGroupAccessDao->getUsersByGroupId($group_ids)->pluck('uid');
+            $children_admin_ids = $this->authGroupAccessDao->getUsersByGroupId($group_ids)->pluck('uid')->toArray();
         } else {
             $children_admin_ids = $this->userDao->getAllUserIds()->toArray();
         }
