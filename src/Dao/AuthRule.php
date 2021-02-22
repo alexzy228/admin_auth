@@ -57,7 +57,7 @@ class AuthRule
     public function getEnableRulesById($ids)
     {
         $rules = $this->model::query()
-            ->select(['id', 'pid', 'path', 'auth', 'icon', 'title', 'ismenu'])
+            ->select(['id', 'pid', 'path', 'auth', 'icon', 'title', 'ismenu', 'remark'])
             ->where('status', '=', '1');
         if (!in_array('*', $ids)) {
             $rules->whereIn('id', $ids);
