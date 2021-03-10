@@ -18,10 +18,11 @@ class CreateAuthTables extends Migration
             $table->string('auth',100)->default('')->comment('接口地址（后端）');
             $table->string('title',50)->default('')->comment('标题');
             $table->string('icon',50)->default('')->comment('图标');
-            $table->string('remark',255)->default('')->comment('备注');
             $table->unsignedtinyInteger('ismenu')->default(0)->comment('是否菜单');
             $table->integer('weigh')->default(0)->comment('权重');
             $table->TinyInteger('status')->default(1)->comment('状态');
+            $table->string('remark',255)->default('')->comment('注释');
+            $table->json('remark')->default('')->comment('备注');
         });
 
         Schema::create('auth_group',function (Blueprint $table){
