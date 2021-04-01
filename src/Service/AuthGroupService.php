@@ -51,14 +51,8 @@ class AuthGroupService
     {
         $children_group_ids = $this->getChildrenGroupIds($withSelf);
         $group_list = $this->authGroupDao->getGroupsById($children_group_ids)->toArray();
-
         $authTree = make(TreeService::class)->init($group_list);
-        if ($this->auth->isSuperAdmin()) {
-            $result = $authTree->getTreeList($authTree->getTreeArray(0));
-        } else {
-            $result = $authTree->getArr();
-        }
-
+        $result = $authTree->getArr();
         $group_name = [];
         foreach ($result as $k => $v) {
             $group_name[$v['id']] = $v['name'];
