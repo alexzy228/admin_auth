@@ -52,15 +52,11 @@ class AuthGroupService
         $children_group_ids = $this->getChildrenGroupIds($withSelf);
         $group_list = $this->authGroupDao->getGroupsById($children_group_ids)->toArray();
 
-        $result = [];
         $authTree = make(TreeService::class)->init($group_list);
         if ($this->auth->isSuperAdmin()) {
             $result = $authTree->getTreeList($authTree->getTreeArray(0));
         } else {
-            $groups = $this->auth->getGroups();
-            foreach ($groups as $m => $n) {
-                $result = array_merge($result, $authTree->getTreeList($authTree->getTreeArray($n['pid'])));
-            }
+            $result = $authTree->getArr();
         }
 
         $group_name = [];
