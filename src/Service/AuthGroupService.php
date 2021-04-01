@@ -47,9 +47,9 @@ class AuthGroupService
      * 获取当前用户权限组列表
      * @return array
      */
-    public function getList()
+    public function getList($withSelf = false)
     {
-        $children_group_ids = $this->getChildrenGroupIds(true);
+        $children_group_ids = $this->getChildrenGroupIds($withSelf);
         $group_list = $this->authGroupDao->getGroupsById($children_group_ids)->toArray();
 
         $result = [];
