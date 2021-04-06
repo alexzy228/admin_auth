@@ -88,7 +88,15 @@ class AuthMiddleware implements MiddlewareInterface
         if ($dispatched->status !== Dispatcher::FOUND) {
             return true;
         }
-        list($class, $method) = $dispatched->handler->callback;
+        $action = $dispatched->handler->callback;
+        if ($action instanceof \Closure){
+            return true;
+        }
+        if (is_string($action)) {
+            $division = strstr($action, '@') ? '@' : "::";
+            $action = explode($division, $action);
+        }
+        list($class, $method) = $action;
         $annotations = AnnotationCollector::getClassMethodAnnotation($class, $method);
         if (isset($annotations[AuthAnnotation::class])) {
             $white_list = $annotations[AuthAnnotation::class];
