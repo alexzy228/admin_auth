@@ -26,7 +26,7 @@ class AuthGroupAccess
 
     public function getUsersByGroupId($group_id)
     {
-        return $this->model::query()->where('group_id', $group_id)->get();
+        return $this->model::query()->whereIn('group_id', $group_id)->get();
     }
 
     public function saveAll($data)
