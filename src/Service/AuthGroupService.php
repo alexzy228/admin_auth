@@ -192,7 +192,7 @@ class AuthGroupService
         $ids = array_diff($ids, $group_ids);
         $group_list = $this->authGroupDao->getGroupsById($ids);
         foreach ($group_list as $key => $value) {
-            $group_user = $this->authGroupAccessDao->getUsersByGroupId($value->id)->toArray();
+            $group_user = $this->authGroupAccessDao->getUsersByGroupId((array)$value->id)->toArray();
             if ($group_user) {
                 $ids = array_diff($ids, [$value->id]);
                 continue;
